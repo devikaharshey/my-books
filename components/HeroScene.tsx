@@ -16,65 +16,71 @@ export function HeroScene() {
   const dotsRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    const ctx = gsap.context(() => {
-      const tl = gsap.timeline({
-        defaults: {
-          ease: "power3.out",
-        },
-      });
+    let ctx: gsap.Context | null = null;
 
-      tl.from(".hero-tag", {
-        y: -20,
-        rotate: -4,
-        opacity: 0,
-        duration: 0.7,
-        force3D: true,
-      })
-        .from(
-          ".hero-line",
-          {
-            yPercent: 100,
-            opacity: 0,
-            stagger: 0.1,
-            duration: 0.9,
-            force3D: true,
+    const runAnimation = () => {
+      ctx = gsap.context(() => {
+        const tl = gsap.timeline({
+          defaults: {
+            ease: "power3.out",
           },
-          "-=0.3",
-        )
-        .from(
-          paraRef.current,
-          {
-            y: 20,
-            opacity: 0,
-            duration: 0.7,
-            force3D: true,
-          },
-          "-=0.5",
-        )
-        .from(
-          polaroidRef.current,
-          {
-            y: 30,
-            rotate: 3,
-            opacity: 0,
-            scale: 0.96,
-            duration: 0.8,
-            force3D: true,
-          },
-          "-=0.5",
-        )
-        .from(
-          arrowRef.current,
-          {
-            opacity: 0,
-            x: -10,
-            duration: 0.5,
-          },
-          "-=0.4",
-        );
-    }, sectionRef);
+        });
 
-    return () => ctx.revert();
+        tl.from(".hero-tag", {
+          y: -20,
+          rotate: -4,
+          opacity: 0,
+          duration: 0.7,
+        })
+          .from(
+            headingRef.current?.querySelectorAll("span") || [],
+            {
+              yPercent: 100,
+              opacity: 0,
+              stagger: 0.12,
+              duration: 0.9,
+            },
+            "-=0.3",
+          )
+          .from(
+            paraRef.current,
+            {
+              y: 20,
+              opacity: 0,
+              duration: 0.7,
+            },
+            "-=0.5",
+          )
+          .from(
+            polaroidRef.current,
+            {
+              y: 30,
+              rotate: 3,
+              opacity: 0,
+              scale: 0.96,
+              duration: 0.8,
+            },
+            "-=0.5",
+          )
+          .from(
+            arrowRef.current,
+            {
+              opacity: 0,
+              x: -10,
+              duration: 0.5,
+            },
+            "-=0.4",
+          );
+      }, sectionRef);
+    };
+
+    window.addEventListener("preloader-complete", runAnimation);
+
+    return () => {
+      window.removeEventListener("preloader-complete", runAnimation);
+
+      ctx?.revert();
+    };
   }, []);
 
   return (
